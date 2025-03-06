@@ -14,7 +14,7 @@
     { title: 'Тип записи', key: 'type', sortable: false },
     { title: 'Логин', key: 'login', sortable: false },
     { title: 'Пароль', key: 'pass', sortable: false },
-    { key: 'actions', align: 'center', sortable: false },
+    { key: 'actions', sortable: false },
   ]
   const optionsType = [
     { title: 'Локальная', value: 'Локальная', key: 'local' },
