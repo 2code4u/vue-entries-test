@@ -10,6 +10,10 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  publicDir: process.env.NODE_ENV === 'production'
+  ? '/vue-entries-test/'
+  : '/',
+
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
