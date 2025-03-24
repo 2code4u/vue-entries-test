@@ -1,18 +1,10 @@
-export type EntriesList<T> = Array<T>
+export type EntriesList = Array<EntriesItem>
 
 export interface EntriesItem {
-  id: number,
-  date: Date | string,
+  id: string,
+  tags: string,
+  tagsFormated: Array<{text: string}>,
   type: string,
-  amount: number,
-  description: string
-}
-
-export interface FilterData {
-  type?: string,
-  sort?: {
-    field: string,
-    type: string
-  },
-  dates?: Array<Date | string>
+  login: string,
+  pass?: string | null
 }

@@ -1,40 +1,57 @@
 import { defineStore } from "pinia"
-import { type EntriesList, type EntriesItem, type FilterData } from "@/interfaces"
+import { type EntriesList, type EntriesItem } from "@/interfaces"
 
 interface EntriesStore {
-  list: EntriesList<EntriesItem>,
-  filterActive: FilterData
+  itemModel: EntriesItem
+  list: EntriesList
 }
 
 export const useEntriesStore = defineStore("entries", {
   state: (): EntriesStore => {
     return {
-      list: [],
-      filterActive: {
-        type: '',
-        sort: {
-          type: 'asc',
-          field: ''
-        },
-        dates: []
-      }
+      itemModel: {
+        id: '',
+        tags: '',
+        tagsFormated: [],
+        type: 'Локальная',
+        login: '',
+        pass: '',
+      },
+      list: [
+        {
+          id: crypto?.randomUUID(),
+          tags: '',
+          tagsFormated: [],
+          type: '',
+          login: '',
+          pass: '',
+        }
+      ],
     };
   },
   actions: {
-    async loadList(filter: FilterData) {
-      Object.assign(this.filterActive, filter) // Реактивно запоминаем значение фильтров из стора
-      const {type, sort, dates} = this.filterActive
-
-      const result = await this.$api.dataBase.getDataList({
-        'type': type,
-        'sort': sort ? {field: sort?.field, type: sort?.type} : '',
-        'dates': dates
-      })
-      this.list = result
+    addElement() {
+      this.list.push({...this.itemModel, id: crypto?.randomUUID()})
     },
-
-    async initStore() {
-      this.list = await this.$api.dataBase.getDataList()
+    removeElement(id: string) {
+      const updateList = this.list.filter(el => el.id !== id)
+      this.list = updateList
+    },
+    saveToStorage() {
+      if(localStorage) {
+        const strFormat = JSON.stringify(this.list)
+        localStorage.setItem('entries-local', strFormat)
+      }
+    },
+    initStore() {
+      if(localStorage) {
+        const strFormat = localStorage.getItem('entries-local')
+        if (strFormat) {
+          try {
+            this.list = JSON.parse(strFormat)
+          } catch (error) {}
+        }
+      }
     },
   },
 })
