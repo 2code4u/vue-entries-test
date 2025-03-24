@@ -1,57 +1,40 @@
 import { defineStore } from "pinia"
-import { type EntriesList, type EntriesItem } from "@/interfaces"
+import { type EntriesList, type EntriesItem, type FilterData } from "@/interfaces"
 
 interface EntriesStore {
-  itemModel: EntriesItem
-  list: EntriesList
+  list: EntriesList<EntriesItem>,
+  filterActive: FilterData
 }
 
 export const useEntriesStore = defineStore("entries", {
   state: (): EntriesStore => {
     return {
-      itemModel: {
-        id: '',
-        tags: '',
-        tagsFormated: [],
-        type: 'Локальная',
-        login: '',
-        pass: '',
-      },
-      list: [
-        {
-          id: crypto?.randomUUID(),
-          tags: '',
-          tagsFormated: [],
-          type: '',
-          login: '',
-          pass: '',
-        }
-      ],
+      list: [],
+      filterActive: {
+        type: '',
+        sort: {
+          type: 'asc',
+          field: ''
+        },
+        dates: []
+      }
     };
   },
   actions: {
-    addElement() {
-      this.list.push({...this.itemModel, id: crypto?.randomUUID()})
+    async loadList(filter: FilterData) {
+      Object.assign(this.filterActive, filter) // Реактивно запоминаем значение фильтров из стора
+      const {type, sort, dates} = this.filterActive
+
+      const result = await this.$api.dataBase.getDataList({
+        'type': type,
+        'sort': sort ? {field: sort?.field, type: sort?.type} : '',
+        'dates': dates
+      })
+      this.list = result
     },
-    removeElement(id: string) {
-      const updateList = this.list.filter(el => el.id !== id)
-      this.list = updateList
-    },
-    saveToStorage() {
-      if(localStorage) {
-        const strFormat = JSON.stringify(this.list)
-        localStorage.setItem('entries-local', strFormat)
-      }
-    },
-    initStore() {
-      if(localStorage) {
-        const strFormat = localStorage.getItem('entries-local')
-        if (strFormat) {
-          try {
-            this.list = JSON.parse(strFormat)
-          } catch (error) {}
-        }
-      }
+
+    async initStore() {
+      this.list = await this.$api.dataBase.getDataList()
     },
   },
 })

@@ -10,10 +10,6 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
-  publicDir: process.env.NODE_ENV === 'production'
-  ? '/vue-entries-test/'
-  : '/',
-  base: '/vue-entries-test/',
 
   resolve: {
     alias: {
